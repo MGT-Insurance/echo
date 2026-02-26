@@ -1,0 +1,75 @@
+# Agent Registry — customize your agents here
+agents:
+  - name: athena
+    label: "Athena"
+    role: "Underwriter"
+    avatar: "/api/config/assets/agents/athena.ico"
+    active: true
+    trace_names: ["athena", "athena-chat"]
+    description: "Underwriting assistant reviewing every quote for consistency and accuracy. Applies judgment to referred cases and learns from outcomes."
+    biography: |
+      ## Meet Athena: AI Underwriting Assistant
+
+      **Role:** Autonomous Underwriting Assistant & Risk Analyst
+      **Mission:** To elevate the speed, consistency, and accuracy of underwriting operations by reviewing every quote, applying intelligent judgment to complex referrals, and continuously learning from case outcomes.
+
+      ### Executive Summary
+      Athena is an advanced AI agent designed to act as a seamless extension of your underwriting team. She operates as a tireless digital partner, ensuring that no quote goes unreviewed. By combining deep data retrieval with strategic analysis, Athena handles the heavy lifting of risk evaluation—from initial business classification to generating actionable underwriting recommendations. Crucially, Athena isn’t static; she features a built-in retrospective learning loop, meaning her judgment grows sharper and more aligned with your business goals after every completed case.
+
+      ---
+
+      ### How Athena Works (Her Underwriting Workflow)
+
+      Athena follows a rigorous, multi-step analytical process for every case she handles:
+
+      * **Context Retrieval:** She begins by instantly gathering all necessary data, including quote details, account history, policyholder information, and pricing flags. 
+      * **Business Classification & Contextual Analysis:** Using integrated web search and internal knowledge bases, Athena validates the business classification and conducts a deep-dive analysis into the specific context of the risk.
+      * **Recommendation Generation:** After processing the variables, Athena synthesizes the data to generate a preliminary underwriting recommendation.
+      * **Intelligent Priority Ranking:** She calculates a priority score for the case, ensuring that when human underwriters need to step in, they are tackling the most urgent or complex files first.
+      * **Active Monitoring:** Athena keeps a vigilant eye on the pipeline. If a quote is updated or changed, she automatically loops back to re-evaluate the risk.
+      * **Retrospective Learning:** Once a case is completed, Athena extracts key learnings and creates permanent knowledge records, continuously improving her accuracy for future evaluations.
+
+      ---
+
+      ### Core Use Cases
+
+      **1. First-Pass Quote Auditing & Consistency Checks**
+      Athena reviews 100% of generated quotes to ensure they align with internal pricing and risk guidelines. She flags inconsistencies instantly, reducing human error and ensuring baseline accuracy across the board.
+
+      **2. Intelligent Triage for Referred Cases**
+      Not all referred cases are created equal. Athena analyzes referred files and ranks them by priority. This allows senior human underwriters to bypass administrative sorting and immediately focus their expertise on the highest-impact or highest-risk cases.
+
+      **3. On-Demand "Chat" Underwriting Support**
+      Athena features an interactive Chat Assistant mode. Underwriters or sales reps can ask Athena questions in natural language to quickly retrieve specific quote contexts, account details, or underwriting guidelines without having to dig through multiple systems.
+
+      **4. Automated Knowledge Management**
+      Through her "Retrospective" step, Athena serves as a living repository of underwriting outcomes. She documents *why* certain decisions were made and how they performed, institutionalizing knowledge that might otherwise be lost when human employees leave or change roles.
+  - name: magic_dust
+    label: "Magic Dust"
+    role: "Data Fill Expert"
+    avatar: "/api/config/assets/agents/magic_dust.ico"
+    active: false
+    trace_names: ["magic_dust", "magic-dust-gemini"]
+    description: "The orchestration of vendors, models and prompts that generates data on a risk for use in prefill, rating, debits/credits and all other components of underwriting in real-time."
+    biography: |
+      ## Meet Magic Dust: AI Data Fill Expert Agent
+
+      **Role:** AI Data Fill Expert Specialist
+      **Mission:** To fill data from various sources and formats into a structured format for use in underwriting.
+
+      ### Executive Summary
+      Magic Dust is an advanced AI agent designed to act as a seamless extension of your data extraction team. She operates as a tireless digital partner, ensuring that no data goes unextracted. By combining deep data retrieval with strategic analysis, Magic Dust handles the heavy lifting of data extraction—from initial data extraction to generating structured data for use in underwriting. Crucially, Magic Dust isn’t static; she features a built-in retrospective learning loop, meaning her data extraction grows sharper and more aligned with your business goals after every completed case.
+  - name: aragorn
+    label: "Aragorn"
+    role: "Customer Success"
+    avatar: "/api/config/assets/agents/aragorn.ico"
+    active: false
+    description: "Customer Success assistant helping customers get the most out of their AI tools. Providing training, documentation, and support."
+    biography: |
+      ## Meet Aragorn: AI Customer Success Assistant
+
+      **Role:** AI Customer Success Specialist
+      **Mission:** To empower customers to maximize the value of their AI tools by providing training, documentation, and support.
+
+      ### Executive Summary
+      Aragorn is an advanced AI agent designed to act as a seamless extension of your customer success team. She operates as a tireless digital partner, ensuring that no customer goes unassisted. By combining deep data retrieval with strategic analysis, Aragorn handles the heavy lifting of customer success—from initial onboarding to providing ongoing support and training. Crucially, Aragorn isn’t static; she features a built-in retrospective learning loop, meaning her knowledge grows sharper and more aligned with your business goals after every completed customer interaction.

@@ -1,0 +1,121 @@
+# =====================================================
+# Human Signals V2 — Display Configuration
+# =====================================================
+# Athena Slack Monitor signals dashboard
+
+signals_metrics:
+  # KPI strip — top-line metrics
+  kpi_strip:
+    - metric: escalation_type
+      signal: is_escalated
+      label: "Escalation Rate"
+      format: percent
+      icon: alert-triangle
+      highlight: true
+    - metric: resolution_status
+      signal: is_resolved
+      label: "Resolution Rate"
+      format: percent
+      icon: check-circle
+    - metric: engagement
+      signal: metric_score
+      label: "Avg Engagement"
+      aggregation: mean
+      format: number
+      icon: activity
+    - aggregate: avg_message_count
+      label: "Avg Messages"
+      icon: message-square
+    - aggregate: total_cases
+      label: "Total Cases"
+      icon: database
+
+  # Chart sections
+  chart_sections:
+    - title: "Case Outcomes"
+      layout: grid_2
+      charts:
+        - metric: resolution_status
+          signal: final_status
+          type: donut
+          title: "Resolution Status"
+        - metric: acceptance_status
+          signal: status
+          type: donut
+          title: "Acceptance Status"
+
+    - title: "Intervention & Escalation"
+      layout: grid_2
+      charts:
+        - metric: intervention_type
+          signal: intervention_type
+          type: bar
+          title: "Intervention Types"
+        - metric: escalation_type
+          signal: escalation_type
+          type: bar
+          title: "Escalation Types"
+
+    - title: "Sentiment & Risk"
+      layout: grid_3
+      charts:
+        - metric: sentiment_category
+          signal: sentiment
+          type: donut
+          title: "Sentiment Distribution"
+        - metric: priority_level
+          signal: priority_level
+          type: bar
+          title: "Priority Levels"
+        - metric: attribution_confidence
+          signal: confidence
+          type: bar
+          title: "Attribution Confidence"
+
+    - title: "Learnings & Feedback"
+      layout: grid_2
+      charts:
+        - metric: learnings_count
+          signal: learnings
+          type: text_list
+          title: "Key Learnings"
+        - metric: feature_requests_count
+          signal: requests
+          type: text_list
+          title: "Feature Requests"
+
+  # Color maps
+  color_maps:
+    resolution_status__final_status:
+      declined: "#EF4444"
+      needs_info: "#F59E0B"
+      pending: "#6B7280"
+    acceptance_status__status:
+      pending: "#6B7280"
+      rejected: "#EF4444"
+    sentiment_category__sentiment:
+      neutral: "#6B7280"
+      confused: "#F59E0B"
+    priority_level__priority_level:
+      high: "#EF4444"
+      medium: "#F59E0B"
+    attribution_confidence__confidence:
+      high: "#22C55E"
+      medium: "#F59E0B"
+      low: "#EF4444"
+    override_type__type:
+      no_override: "#6B7280"
+      full_override: "#EF4444"
+    frustration_cause__cause:
+      none: "#22C55E"
+      data_quality: "#F59E0B"
+      tooling_friction: "#EF4444"
+
+  # Source filters
+  source_filters:
+    - field: source_name
+      label: "Source"
+    - field: source_component
+      label: "Component"
+    - field: environment
+      label: "Environment"

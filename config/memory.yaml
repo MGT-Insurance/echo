@@ -1,0 +1,16 @@
+memory:
+  action_colors:
+    decline: "#E74C3C"
+    refer: "#F39C12"
+    approve_with_conditions: "#3498DB"
+    flag_for_review: "#7F8C8D"
+    verify: "#8B9F4F"
+    exclude: "#9B59B6"
+    recommend_inspection: "#1ABC9C"
+    calibrate: "#D4AF37"
+
+  contradictory_pairs:
+    - [decline, approve_with_conditions]
+    - [decline, verify]
+    - [exclude, refer]
+    - [exclude, approve_with_conditions]

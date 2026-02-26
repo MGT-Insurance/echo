@@ -1,0 +1,32 @@
+# Agent Replay Lookup Database Configuration
+
+agent_replay_db:
+  # Master switch
+  enabled: true
+
+  # Database connection — password injected at runtime via AGENT_REPLAY_DB_PASSWORD env var
+  host: ep-damp-fog-ahx4fv12-pooler.c-3.us-east-1.aws.neon.tech
+  port: 5432
+  database: neondb
+  username: neondb_owner
+  password: null
+  ssl_mode: require
+
+  # Default schema and table
+  # schema: public
+  # table: athena_cases
+
+  # # Default column mapping
+  # search_column: quote_locator
+  # search_column_label: Quote Locator
+  # trace_id_column: langfuse_trace_id
+  # agent_name_column: agent_name
+
+  agents:
+    athena:
+      table: athena_cases
+      search_columns:
+        quote_locator: Quote Locator
+        quote_number: Quote Number
+        policyholder_name: Policy Holder Name
+      trace_id_column: langfuse_trace_id

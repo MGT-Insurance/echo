@@ -1,0 +1,25 @@
+eval_db:
+    eval_runner_enabled: false
+    enabled: true
+    auto_load: false          # false = wizard only, no auto-import on startup
+
+    # Database connection — password injected at runtime via EVAL_DB_PASSWORD env var
+    host: host.docker.internal
+    port: 5432
+    database: eval
+    username: mattevanoff
+    password: null
+    ssl_mode: disable
+
+    # Optionally restrict which tables appear in the picker
+    tables:
+      - evaluation_view
+
+    # Optionally add filter dropdowns in the wizard
+    filters:
+      - column: evaluation_name
+        label: Experiment Name
+      - column: run_id
+        label: Run ID
+      - column: eval_mode
+        label: Evaluation Mode
