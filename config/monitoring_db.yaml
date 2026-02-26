@@ -9,12 +9,12 @@ monitoring_db:
   enabled: true
   auto_load: true
   dataset_query: |
-      SELECT *, created_at AS sync_watermark 
+      SELECT *, created_at AS sync_watermark
       FROM evaluation_dataset
-      WHERE source_type = 'langfuse' 
+      WHERE source_type = 'langfuse'
   results_query: |
-      SELECT *, "timestamp" AS sync_watermark 
-      FROM evaluation_results 
+      SELECT *, "timestamp" AS sync_watermark
+      FROM evaluation_results
       WHERE eval_mode = 'online'
   query_timeout: 120
   row_limit: 10000

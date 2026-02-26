@@ -22,7 +22,7 @@ agents:
 
       Athena follows a rigorous, multi-step analytical process for every case she handles:
 
-      * **Context Retrieval:** She begins by instantly gathering all necessary data, including quote details, account history, policyholder information, and pricing flags. 
+      * **Context Retrieval:** She begins by instantly gathering all necessary data, including quote details, account history, policyholder information, and pricing flags.
       * **Business Classification & Contextual Analysis:** Using integrated web search and internal knowledge bases, Athena validates the business classification and conducts a deep-dive analysis into the specific context of the risk.
       * **Recommendation Generation:** After processing the variables, Athena synthesizes the data to generate a preliminary underwriting recommendation.
       * **Intelligent Priority Ranking:** She calculates a priority score for the case, ensuring that when human underwriters need to step in, they are tackling the most urgent or complex files first.
