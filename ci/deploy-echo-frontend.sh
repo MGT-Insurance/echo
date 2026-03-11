@@ -119,13 +119,18 @@ if [[ "$VERCEL_ENV" == "production" ]]; then
 fi
 
 echo "Deploying to Vercel ($VERCEL_ENV)..."
-DEPLOY_URL=$(vercel deploy $DEPLOY_FLAGS 2>&1 | tail -1)
-echo "Deploy URL: $DEPLOY_URL"
+DEPLOY_OUTPUT=$(vercel deploy $DEPLOY_FLAGS 2>&1)
+echo "$DEPLOY_OUTPUT"
 
-if [[ -z "$DEPLOY_URL" || "$DEPLOY_URL" != http* ]]; then
+# Extract URL from Vercel output (matches https://*.vercel.app or custom domain URLs)
+DEPLOY_URL=$(echo "$DEPLOY_OUTPUT" | grep -oE 'https://[a-zA-Z0-9._-]+\.vercel\.app[a-zA-Z0-9/_-]*' | head -1)
+
+if [[ -z "$DEPLOY_URL" ]]; then
   echo "Error: Failed to capture deploy URL from Vercel output."
   exit 1
 fi
+
+echo "Deploy URL: $DEPLOY_URL"
 
 # --- Smoke tests ---
 echo ""
