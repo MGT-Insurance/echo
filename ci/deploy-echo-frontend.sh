@@ -122,8 +122,8 @@ echo "Deploying to Vercel ($VERCEL_ENV)..."
 DEPLOY_OUTPUT=$(vercel deploy $DEPLOY_FLAGS 2>&1)
 echo "$DEPLOY_OUTPUT"
 
-# Extract URL from Vercel output (matches https://*.vercel.app or custom domain URLs)
-DEPLOY_URL=$(echo "$DEPLOY_OUTPUT" | grep -oE 'https://[a-zA-Z0-9._-]+\.vercel\.app[a-zA-Z0-9/_-]*' | head -1)
+# Extract deploy URL from "Production:" or "Preview:" line in Vercel output
+DEPLOY_URL=$(echo "$DEPLOY_OUTPUT" | grep -E '^\s*(Production|Preview):' | grep -oE 'https://[^ ]+' | head -1)
 
 if [[ -z "$DEPLOY_URL" ]]; then
   echo "Error: Failed to capture deploy URL from Vercel output."
