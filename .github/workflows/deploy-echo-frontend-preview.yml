@@ -12,6 +12,9 @@ on:
         required: false
         default: ''
 
+permissions:
+  pull-requests: write
+
 concurrency:
   group: deploy-echo-frontend-preview-${{ github.event.pull_request.number || github.run_id }}
   cancel-in-progress: true
