@@ -1,175 +1,84 @@
-<p align="center">
-  <img src="branding/echo.png" alt="Echo" width="400" />
-</p>
-
 # Echo
 
-Use-case configuration for **Echo** — MGT's observability and evaluation studio, powered by [AXIS](https://github.com/ax-foundry/axis).
+Deployment controller for the **Echo** frontend — MGT's observability and evaluation studio, powered by [AXIS](https://github.com/ax-foundry/axis).
 
-This repo contains branding, agent avatars, and YAML configs. It has no application code — AXIS (Repo A) provides the framework, and this repo customizes it for the Echo deployment.
+This repo deploys the AXIS Next.js frontend to Vercel. Config, branding, and agent avatars live in mlds-services and are served by the backend at runtime.
+
+## Architecture
+
+```
+Browser ──/api/*──> Vercel (Next.js) ──rewrite──> Cloud Run (FastAPI)
+                     same-origin       INTERNAL_API_URL (server-side)
+```
+
+- All browser API calls use relative paths (`/api/...`) — no CORS
+- Next.js server-side rewrites proxy `/api/*` to Cloud Run via `INTERNAL_API_URL`
+- Branding, config, and assets are served by the backend at runtime
+
+## How to Deploy
+
+1. Get the AXIS commit SHA you want to deploy
+2. Update `ci/axis-version` with the SHA
+3. Commit and push to `main`
+4. The production workflow deploys automatically (requires environment approval)
+
+```bash
+echo "abc1234def5678..." > ci/axis-version
+git add ci/axis-version
+git commit -m "bump AXIS to abc1234"
+git push origin main
+```
+
+## How to Rollback
+
+Revert the `ci/axis-version` commit:
+
+```bash
+git revert HEAD
+git push origin main
+```
+
+Or use the Vercel dashboard to promote a previous deployment.
+
+## Preview Deploys
+
+PRs that change `ci/axis-version` or `ci/deploy-echo-frontend.sh` automatically get a Vercel preview deploy. The preview URL is posted as a PR comment.
 
 ## Repository Structure
 
 ```
 echo/
-├── config/                    # YAML configuration files
-│   ├── theme.yaml             # Branding, color palette, hero image
-│   ├── agents.yaml            # Agent registry (name, role, avatar)
-│   ├── eval_db.yaml           # Evaluation database connection
-│   ├── monitoring_db.yaml     # Monitoring database connection
-│   ├── human_signals_db.yaml  # Human signals database connection
-│   ├── kpi_db.yaml            # KPI database connection
-│   ├── agent_replay.yaml      # Agent replay (Langfuse) settings
-│   ├── agent_replay_db.yaml   # Agent replay lookup database
-│   ├── signals_metrics.yaml   # Signals dashboard display overrides
-│   ├── duckdb.yaml            # DuckDB embedded store settings
-│   └── memory.yaml            # Memory/rule-extraction display config
-├── branding/                  # Hero images, logos, favicons
-├── agents/                    # Agent avatar images
-├── .gitignore
+├── ci/
+│   ├── axis-version                 # Pinned AXIS commit SHA
+│   └── deploy-echo-frontend.sh      # Deploy script
+├── .github/workflows/
+│   ├── deploy-echo-frontend-production.yml
+│   └── deploy-echo-frontend-preview.yml
 └── README.md
 ```
 
-## Credentials Policy
+## Required Secrets (GitHub Actions)
 
-**No secrets in this repo.** YAML config files define non-secret fields (`host`, `port`, `database`, `username`, `ssl_mode`, queries, display settings) and set `password: null`. Actual credentials are injected at runtime:
+| Secret | Description |
+|--------|-------------|
+| `VERCEL_TOKEN` | Vercel deploy token |
+| `VERCEL_ORG_ID` | Vercel team/org ID |
+| `VERCEL_PROJECT_ID` | Vercel project ID |
+| `AXIS_CLONE_TOKEN` | GitHub PAT with read access to `ax-foundry/axis` |
 
-- **Local dev**: environment variables in the AXIS repo's `backend/.env` (gitignored)
-- **Production**: GCP Secret Manager via `--set-secrets` in Cloud Run
-
-## Local Development
-
-### Prerequisites
-
-- [AXIS](https://github.com/ax-foundry/axis) cloned locally
-- Python 3.12+, Node.js 20+
-
-### Setup
-
-Clone both repos side by side:
+## Local Testing
 
 ```bash
-git clone https://github.com/ax-foundry/axis.git
-git clone https://github.com/MGT-Insurance/echo.git
+export VERCEL_TOKEN=xxx
+export VERCEL_ORG_ID=xxx
+export VERCEL_PROJECT_ID=xxx
+export AXIS_CLONE_TOKEN=xxx  # if AXIS repo is private
+
+./ci/deploy-echo-frontend.sh --vercel-env preview
 ```
-
-Point AXIS at this repo:
-
-```bash
-cd axis
-export AXIS_CUSTOM_DIR=/path/to/echo
-```
-
-> **Tip**: Add `AXIS_CUSTOM_DIR` to your shell profile or a `.envrc` (if using direnv) so you don't have to re-export it every session.
-
-### Inject Database Passwords
-
-Create or update `axis/backend/.env` (gitignored in the AXIS repo) with the passwords that correspond to the YAML configs:
-
-```bash
-# Database passwords (match host/port/database in YAML configs)
-EVAL_DB_PASSWORD=<your-password>
-MONITORING_DB_PASSWORD=<your-password>
-HUMAN_SIGNALS_DB_PASSWORD=<your-password>
-AGENT_REPLAY_DB_PASSWORD=<your-password>
-KPI_DB_PASSWORD=<your-password>
-
-# API keys
-OPENAI_API_KEY=sk-proj-...
-ANTHROPIC_API_KEY=sk-ant-...
-
-# Langfuse (per-agent credentials)
-LANGFUSE_ATHENA_PUBLIC_KEY=pk-lf-...
-LANGFUSE_ATHENA_SECRET_KEY=sk-lf-...
-LANGFUSE_MAGIC_DUST_PUBLIC_KEY=pk-lf-...
-LANGFUSE_MAGIC_DUST_SECRET_KEY=sk-lf-...
-```
-
-### Run
-
-```bash
-make dev   # Starts backend + frontend + FalkorDB
-```
-
-The backend reads YAML configs from `AXIS_CUSTOM_DIR/config/` and serves branding/agent images from the corresponding directories. Changes to this repo are picked up on backend restart.
-
-### Docker Compose
-
-If using Docker Compose, update the volume mount in `axis/docker-compose.yml` to point at this repo:
-
-```yaml
-services:
-  backend:
-    volumes:
-      - /path/to/echo:/app/custom:ro
-```
-
-## Production Deployment
-
-Echo is deployed via a platform repo (Repo C) that assembles AXIS + Echo into a single Docker image.
-
-### How It Works
-
-1. Repo C's CI checks out AXIS (Repo A) and Echo (Repo B)
-2. Echo's directories are copied into the AXIS build context:
-   ```bash
-   cp -r echo/config   axis/backend/custom/config
-   cp -r echo/branding axis/backend/custom/branding
-   cp -r echo/agents   axis/backend/custom/agents
-   ```
-3. The Docker image is built from `axis/backend/`
-4. Secrets are injected at runtime from GCP Secret Manager
-
-### Runtime Secrets
-
-These are set via `--set-secrets` in the Cloud Run deploy command (never stored in this repo):
-
-| Secret | Source |
-|--------|--------|
-| `EVAL_DB_PASSWORD` | GCP Secret Manager |
-| `MONITORING_DB_PASSWORD` | GCP Secret Manager |
-| `HUMAN_SIGNALS_DB_PASSWORD` | GCP Secret Manager |
-| `AGENT_REPLAY_DB_PASSWORD` | GCP Secret Manager |
-| `KPI_DB_PASSWORD` | GCP Secret Manager |
-| `OPENAI_API_KEY` | GCP Secret Manager |
-| `ANTHROPIC_API_KEY` | GCP Secret Manager |
-| `LANGFUSE_*_SECRET_KEY` | GCP Secret Manager |
-
-### Config Load Order
-
-The backend resolves configuration in this order (first match wins):
-
-1. Environment variables (from Secret Manager or Cloud Run settings)
-2. YAML files in `config/` (baked into the image)
-3. Hardcoded defaults in AXIS `backend/app/config.py`
-
-### Image Serving
-
-Branding and agent images are served by the backend at:
-
-- `/api/config/assets/branding/{filename}` — 1-year immutable cache
-- `/api/config/assets/agents/{filename}` — 24-hour cache
-
-The frontend references these URLs directly. No frontend build step depends on this repo.
-
-## Making Changes
-
-### Branding or theme update
-
-Edit `config/theme.yaml` or add/replace files in `branding/`. Commit, push, and bump the config ref in Repo C to deploy.
-
-### New agent
-
-1. Add the avatar image to `agents/`
-2. Add the agent entry to `config/agents.yaml`
-3. Commit and push
-
-### Database config change
-
-Edit the relevant `config/*_db.yaml`. Non-secret fields (host, port, queries, thresholds) go here. Password changes go in GCP Secret Manager.
 
 ## Rules
 
-- **No credentials** — passwords, API keys, and tokens are never committed
-- **No application code** — custom behavior goes in AXIS behind a config flag
-- **No infrastructure** — Terraform, Docker, CI workflows belong in Repo C
+- **Production deploys always use `ci/axis-version`** — no manual SHA overrides for production
+- **No application code** — the frontend is AXIS; this repo only controls deployment
+- **No config/branding** — those live in mlds-services, served by the backend

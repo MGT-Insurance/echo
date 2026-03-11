@@ -1,0 +1,32 @@
+name: Deploy Echo Frontend (Production)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'ci/axis-version'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-echo-frontend-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout echo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Deploy to Vercel (production)
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: bash ci/deploy-echo-frontend.sh --vercel-env production
