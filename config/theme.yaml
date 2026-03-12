@@ -37,6 +37,7 @@ theme:
   # Branding — customize text shown throughout the app
   branding:
    app_name: " Echo"
+   app_icon_url: "/api/config/assets/branding/echo-small.png"
    tagline: "Listen. Learn. Improve."
    subtitle: "MGT Observability & Evaluation Studio"
    description: |-
