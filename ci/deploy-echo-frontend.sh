@@ -132,24 +132,34 @@ fi
 
 echo "Deploy URL: $DEPLOY_URL"
 
+# Use FRONTEND_URL for smoke tests if set (required when the per-deployment alias
+# URL is not routable, e.g. only the production domain is configured in Vercel).
+SMOKE_URL="${FRONTEND_URL:-$DEPLOY_URL}"
+
 # --- Smoke tests ---
 echo ""
 echo "=== Smoke Tests ==="
 
-# Hard gate: frontend loads
-echo "Checking frontend health..."
-HTTP_CODE=$(curl -fL -s -o /dev/null -w "%{http_code}" --max-time 30 "$DEPLOY_URL" || true)
+# Hard gate: frontend loads (hard fail for production, warning for preview)
+echo "Checking frontend health (${SMOKE_URL})..."
+CURL_FLAGS=(-fL -s -o /dev/null -w "%{http_code}" --max-time 30)
+if [[ -n "${VERCEL_BYPASS_SECRET:-}" ]]; then
+  CURL_FLAGS+=(-H "x-vercel-protection-bypass: ${VERCEL_BYPASS_SECRET}")
+fi
+HTTP_CODE=$(curl "${CURL_FLAGS[@]}" "$SMOKE_URL" || true)
 if [[ "$HTTP_CODE" == "200" ]]; then
   echo "PASS: Frontend returned HTTP $HTTP_CODE"
-else
+elif [[ "$VERCEL_ENV" == "production" ]]; then
   echo "FAIL: Frontend returned HTTP $HTTP_CODE (expected 200)"
   exit 1
+else
+  echo "WARNING: Frontend returned HTTP $HTTP_CODE — per-deployment URLs require wildcard domain config in Vercel to be routable"
 fi
 
 # Soft gate: API reachability (warn-only)
 # TODO: make hard-fail after Gate 0a (Cloud Run auth) is resolved
 echo "Checking API reachability..."
-API_CODE=$(curl -fL -s -o /dev/null -w "%{http_code}" --max-time 30 "$DEPLOY_URL/api/config/theme" || true)
+API_CODE=$(curl "${CURL_FLAGS[@]}" "$SMOKE_URL/api/config/theme" || true)
 if [[ "$API_CODE" == "200" ]]; then
   echo "PASS: API returned HTTP $API_CODE"
 else
