@@ -100,6 +100,10 @@ fi
 
 cd "$FRONTEND_DIR"
 
+# Remove standalone output mode — incompatible with Vercel deployments.
+# output: 'standalone' is for Docker/self-hosted only; Vercel handles its own optimization.
+sed -i.bak "s/  output: 'standalone',//" next.config.js && rm -f next.config.js.bak
+
 # --- Install Vercel CLI ---
 echo "Installing Vercel CLI v${VERCEL_CLI_VERSION}..."
 npm install -g "vercel@${VERCEL_CLI_VERSION}" --silent
