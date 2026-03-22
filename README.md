@@ -1,5 +1,10 @@
 # Echo
 
+<p align="center">
+  <img src="resources/echo.png" width="500" alt="hero">
+</p>
+
+
 Deployment controller for the **Echo** frontend — MGT's observability and evaluation studio, powered by [AXIS](https://github.com/ax-foundry/axis).
 
 This repo contains no application code and no config. Its sole job is to pin an AXIS commit SHA and deploy the AXIS Next.js frontend to Vercel.
@@ -47,9 +52,10 @@ Or promote a previous deployment from the Vercel dashboard.
 1. Reads the AXIS SHA from `ci/axis-version` (or `--axis-ref` override)
 2. Validates the SHA format (must be a commit hash — branches/tags rejected)
 3. Clones `ax-foundry/axis` and checks out the pinned SHA
-4. Installs Vercel CLI and pulls project settings
-5. Deploys `axis/frontend/` to Vercel
-6. Runs smoke tests:
+4. Replaces the AXIS favicon with the Echo icon (`resources/echo.png`)
+5. Installs Vercel CLI and pulls project settings
+6. Deploys `axis/frontend/` to Vercel
+7. Runs smoke tests:
    - **Hard gate**: frontend returns HTTP 200
    - **Soft gate** (warn-only): `/api/config/theme` returns HTTP 200
 
@@ -66,6 +72,8 @@ echo/
 ├── ci/
 │   ├── axis-version                          # Pinned AXIS commit SHA
 │   └── deploy-echo-frontend.sh               # Deploy script
+├── resources/
+│   └── echo.png                              # Echo favicon (replaces AXIS default at deploy time)
 ├── .github/workflows/
 │   ├── deploy-echo-frontend-production.yml   # Triggers on push to main (ci/axis-version change)
 │   └── deploy-echo-frontend-preview.yml      # Triggers on PRs + workflow_dispatch
@@ -87,7 +95,6 @@ Set these in the Vercel project settings:
 
 | Variable | Notes |
 |----------|-------|
-| `NEXT_PUBLIC_API_URL` | Public Cloud Run URL |
 | `INTERNAL_API_URL` | Cloud Run URL used server-side (e.g. `https://echo-xxx.run.app`) |
 | `API_GATEWAY_KEY` | Must match `API_GATEWAY_KEY` on the Cloud Run backend |
 | `NEXTAUTH_URL` | Vercel deployment URL (e.g. `https://echo.vercel.app`) |
@@ -174,24 +181,3 @@ make dev
 
 - Backend: http://localhost:8500
 - Frontend: http://localhost:3500
-
----
-
-## Local Testing (Deploy Script)
-
-```bash
-export VERCEL_TOKEN=xxx
-export VERCEL_ORG_ID=xxx
-export VERCEL_PROJECT_ID=xxx
-export AXIS_CLONE_TOKEN=xxx  # if AXIS repo is private
-
-./ci/deploy-echo-frontend.sh --vercel-env preview
-# or with a specific SHA:
-./ci/deploy-echo-frontend.sh --vercel-env preview --axis-ref abc1234
-```
-
-## Rules
-
-- **Production deploys always use `ci/axis-version`** — no manual SHA overrides for production
-- **No application code** — the frontend is AXIS; this repo only controls deployment
-- **No config/branding/agents** — those live in `mlds-services/services/echo/`, served by the Cloud Run backend

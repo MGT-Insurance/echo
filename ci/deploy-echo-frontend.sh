@@ -100,6 +100,24 @@ fi
 
 cd "$FRONTEND_DIR"
 
+# --- Replace AXIS favicon with Echo icon ---
+ECHO_ICON="$REPO_ROOT/resources/echo.png"
+if [[ -f "$ECHO_ICON" ]]; then
+  echo "Replacing favicon with Echo icon..."
+  # App Router: app/icon.png is auto-detected by Next.js as the favicon
+  if [[ -d "app" ]]; then
+    cp "$ECHO_ICON" app/icon.png
+    # Remove any existing favicon.ico in app/ so it doesn't take precedence
+    rm -f app/favicon.ico
+  fi
+  # Public dir fallback
+  mkdir -p public
+  cp "$ECHO_ICON" public/favicon.png
+  rm -f public/favicon.ico
+else
+  echo "Warning: Echo icon not found at $ECHO_ICON — using default AXIS favicon"
+fi
+
 # Remove standalone output mode — incompatible with Vercel deployments.
 # output: 'standalone' is for Docker/self-hosted only; Vercel handles its own optimization.
 sed -i.bak "s/  output: 'standalone',//" next.config.js && rm -f next.config.js.bak
